@@ -20,6 +20,7 @@ if !get(g:, 'kitty_navigator_no_mappings', 0)
   nnoremap <silent> <c-k> :KittyNavigateUp<cr>
   nnoremap <silent> <c-l> :KittyNavigateRight<cr>
   nnoremap <silent> <c-w> :KittyNavigateNext<cr>
+  nnoremap <silent> <c-p> :KittyNavigatePrevious<cr>
 endif
 
 command! KittyNavigateLeft     call s:KittyAwareNavigate('h')
@@ -27,6 +28,7 @@ command! KittyNavigateDown     call s:KittyAwareNavigate('j')
 command! KittyNavigateUp       call s:KittyAwareNavigate('k')
 command! KittyNavigateRight    call s:KittyAwareNavigate('l')
 command! KittyNavigateNext     call s:KittyAwareNavigate('w')
+command! KittyNavigatePrevious call s:KittyAwareNavigate('p')
 
 function! s:KittyCommand(args)
   let pw = get(g:, 'kitty_navigator_password', 0)
@@ -53,7 +55,7 @@ function! s:KittyAwareNavigate(direction)
   if !kitty_last_pane
     call s:VimNavigate(a:direction)
   endif
-  let at_tab_page_edge = (a:direction == 'w') ? (nr == winnr('$')) : (nr == winnr())
+  let at_tab_page_edge = ((a:direction == 'w') || (a:direction == 'p')) ? (nr == winnr('$')) : (nr == winnr())
 
   let kitty_is_in_stack_layout = s:KittyIsInStackLayout()
   let stack_layout_enabled = get(g:, 'kitty_navigator_enable_stack_layout', 0)
@@ -67,7 +69,8 @@ function! s:KittyAwareNavigate(direction)
     \   "j": "focus-window --match neighbor:bottom",
     \   "k": "focus-window --match neighbor:top",
     \   "l": "focus-window --match neighbor:right",
-    \   "w": "kitten next_window.py"
+    \   "w": "kitten next_window.py 1",
+    \   "p": "kitten next_window.py -1"
     \ }
     let kitty_command = kitty_command_mappings[a:direction]
     silent call s:KittyCommand(kitty_command)
